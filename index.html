@@ -12,11 +12,13 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous">
     <link href="style.css" rel="stylesheet">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
   </head>
 
   <body>
-
+    <div id="app">
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container">
@@ -76,31 +78,16 @@
 
           <div class="card  mb-3" style="max-width: 18rem;">
             <div class="card-body">
-              <input type="text" placeholder="Search...">
+              <input type="text" placeholder="Search from popular list...">
               <button class="btn-info">Search</button>
             </div>
           </div>
+          <button @click='getPopMeme'>Get 100 Most Popular Memes</button>
 
           <div class="card  mb-3" style="max-width: 18rem;">
             <div class="card-body">
               <h5 class="card-title">Recently Followed</h5>
-              <ul id="recently-followed">
-                <li>
-                  <a href="#">infobandung</a>
-                </li>
-                <li>
-                  <a href="#">pramborsfm</a>
-                </li>
-                <li>
-                  <a href="#">thebalibible</a>
-                </li>
-                <li>
-                  <a href="#">threewisemonkeys</a>
-                </li>
-                <li>
-                  <a href="#">sushitei</a>
-                </li>
-              </ul>
+              
             </div>
           </div>
 
@@ -108,70 +95,61 @@
         <!-- /.col-lg-3 -->
 
         <div class="col-lg-6">
-
+            <!-- <div class="getMeme">
+                
+                <div class="popMeme" v-for='meme in popMemeList'>
+                  <img src="{{ meme }}" alt="">
+                </div>
+              </div> -->
           <div class="row">
-            <div class="col-lg-12 col-md-12 mb-12 form-horizontal">
+            <div class="col-lg-12 col-md-12 mb-12 form-horizontal" >
               <div class="form-group">
-                <textarea class="form-control" placeholder="What's happening?" rows="3"></textarea>
-              </div>
-              <div class="form-group">
-                <button class="btn-info">Post</button>
+                <button class="btn-success" @click='showCreateForm=true'>I want to make new MEME !</button>
               </div>
             </div>
           </div>
           <hr>
+          <!-- FORM -->
+            <div class='content-wrapper' v-if='showCreateForm'>
+              <div class='meme'>
+                <div class='content'>
+                  <div><h1 style="text-align: center">{{ text_top }}</h1></div>
+                  <img v-bind:src='image'>
+                  <h1 style="text-align: center">{{ text_bottom }}</h1>
+                </div>
+              </div>
+              <div class='update'><br>
+                <label id="text-top">Caption top</label><br>
+                <input v-model='text_top'><br><br>
+                <label id="text-bottom">Caption Bottom</p>
+                <input v-model='text_bottom'><br><br>
+                <p>From URL</p>
+                <input id="imgURL" class="block" type="text" placeholder="Link to image" />
+                <p>From Local Disk</p>
+                <input id="imgFile" type="file" accept="image/*" v-model='image'/><br><br>
+                <button class="btn btn-success" @click='saveMeme'>Save Meme</button>
+              </div>
+            </div>
+            
+          <!-- FORM END -->
+          <!-- <div className="ui fluid image">
+              <img src='http://i.imgflip.com/1bij.jpg'/>
+              <div style="position: absolute; bottom: 0px; width: 100%; height: auto;">TEST</div>
+          </div> -->
+          <div class="make-meme"></div>
 
-          <div class="row">
-            <div class="col-lg-12 col-md-12 timeline-wrapper">
+          <div class="row" v-for='meme in popMemeList'>
+            <div class="col-lg-12 col-md-12 timeline-wrapper" >
               <div class="media ">
-                <img class="d-flex mr-3 rounded-circle" src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260" alt="">
+                <img class="d-flex" :src='meme.url' alt="">
                 <span class="media-body twit-status">
-                  <h5 class="mt-0">Johny Walker</h5>
-                  <p>@johnywalker</p>
-                  Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+                  <h5 class="mt-0">{{ meme.name }}</h5><br>
                 </span>
               </div>
             </div>
           </div>
 
-          <div class="row">
-            <div class="col-lg-12 col-md-12 timeline-wrapper">
-              <div class="media ">
-                <img class="d-flex mr-3 rounded-circle" src="https://images.pexels.com/photos/235444/pexels-photo-235444.jpeg?auto=compress&cs=tinysrgb&h=350" alt="">
-                <span class="media-body twit-status">
-                  <h5 class="mt-0">Catherine Rose</h5>
-                  <p>@cathrose</p>
-                  Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-lg-12 col-md-12 timeline-wrapper">
-              <div class="media ">
-                <img class="d-flex mr-3 rounded-circle" src="https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg?auto=compress&cs=tinysrgb&h=350" alt="">
-                <span class="media-body twit-status">
-                  <h5 class="mt-0">Michael Adam</h5>
-                  <p>@mchladam</p>
-                  Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-lg-12 col-md-12 timeline-wrapper">
-              <div class="media ">
-                <img class="d-flex mr-3 rounded-circle" src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260" alt="">
-                <span class="media-body twit-status">
-                  <h5 class="mt-0">Johny Walker</h5>
-                  <p>@johnywalker</p>
-                  Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-                </span>
-              </div>
-            </div>
-          </div>
+          
           <!-- /.row -->
 
         </div>
@@ -243,8 +221,46 @@
       <!-- /.row -->
 
     </div>
+  </div>
     <!-- /.container -->>
+    <!-- SCRIPT -->
+    <script src="./script.js"></script>
+    <script>
+    let app = new Vue ({
+      el:'#app',
+      data: {
+        popMemeList: [],
+        selectedUrlImage: '',
+        image: '',
+        text_top: '',
+        text_bottom: '',
+        showCreateForm: false
 
+      },
+      created() {
+
+      },
+      watcher() {
+
+      },
+      methods: {
+        saveMeme() {
+
+        },
+        getPopMeme() {
+          axios.get('https://api.imgflip.com/get_memes')
+          .then((result) => {
+            // console.log(result)
+            app.popMemeList = result.data.data.memes
+            console.log(app.popMemeList[0].url)
+          }).catch((err) => {
+            console.log(err)
+          });
+        }
+      }
+    })
+    
+    </script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>

@@ -12,6 +12,10 @@ body {
   float: left;
 }
 
+.d-flex {
+    height: 200px;
+    width: 200px;
+}
 .twit-status h5 {
   float: left;
   margin-right: 5px;
@@ -66,7 +70,8 @@ body {
     border: 1px solid #e1e8ed;
     border-radius: 6px;
     height: 200px;
-    max-width: 340px; // orginal twitter width: 290px;
+    max-width: 340px; // orginal twitter 
+    width: 290px;
     margin-bottom: 10px;
 }
 .twPc-bg {
