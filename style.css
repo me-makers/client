@@ -70,8 +70,8 @@ body {
     border: 1px solid #e1e8ed;
     border-radius: 6px;
     height: 200px;
-    max-width: 340px; // orginal twitter 
-    width: 290px;
+    max-width: 340px; 
+    width: 255px;
     margin-bottom: 10px;
 }
 .twPc-bg {
@@ -163,5 +163,16 @@ ul.twPc-Arrange {
 .content img {
     width: 500px;
     height: auto;
-    max-height: 600px;
+    min-height: 250px;
+    max-height: 650px;
+}
+
+.no-scroll {
+    position: fixed;
+    top: 0;
+    padding: 1em;
+}
+
+#capture {
+    max-height: 800px;
 }
