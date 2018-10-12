@@ -23,6 +23,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container">
         <a class="navbar-brand" href="#">Me-Maker</a>
+
         <div class="header-right">
           <input type="text" placeholder="username / email">
           <input type="password" placeholder="password">
@@ -114,7 +115,9 @@
               <div class='meme'>
                 <div class='content'>
                   <div><h1 style="text-align: center">{{ text_top }}</h1></div>
-                  <img v-bind:src='image'>
+
+                  <img v-bind:src='image' v-if='image'>
+                  <img src="//placehold.it/500x500" v-else>
                   <h1 style="text-align: center">{{ text_bottom }}</h1>
                 </div>
               </div>
@@ -124,10 +127,10 @@
                 <label id="text-bottom">Caption Bottom</p>
                 <input v-model='text_bottom'><br><br>
                 <p>From URL</p>
-                <input id="imgURL" class="block" type="text" placeholder="Link to image" />
+                <input id="imgURL" class="block" v-model='image' type="text" placeholder="Link to image" :disabled="isDisabled"/>
                 <p>From Local Disk</p>
-                <input id="imgFile" type="file" accept="image/*"/><br><br>
-                <button class="btn btn-success" @click='saveMeme'>Save Meme</button>
+                <input id="imgFile" type="file" accept="image/*" ref="file" v-on:change="handleFileUpload()"/><br><br>
+                <button class="btn btn-success" @click='saveMeme'>Create Meme</button>
               </div>
             </div>
             
@@ -136,6 +139,19 @@
               <img src='http://i.imgflip.com/1bij.jpg'/>
               <div style="position: absolute; bottom: 0px; width: 100%; height: auto;">TEST</div>
           </div> -->
+
+          <div class="make-meme"></div>
+
+          <div class="row" v-for='meme in popMemeList'>
+            <div class="col-lg-12 col-md-12 timeline-wrapper" >
+              <div class="media ">
+                <img class="d-flex" :src='meme.url' alt="">
+                <span class="media-body twit-status">
+                  <h5 class="mt-0">{{ meme.name }}</h5><br>
+                </span>
+              </div>
+            </div>
+          </div>
           
           <!-- /.row -->
 
@@ -170,6 +186,7 @@
   </div>
     <!-- /.container -->>
     <!-- SCRIPT -->
+
     <script src="./script.js"></script>
     <script>
     let app = new Vue ({
@@ -181,16 +198,14 @@
         image: '',
         text_top: '',
         text_bottom: '',
-        showCreateForm: false
+        showCreateForm: false,
+        isDisabled: false
 
       },
       created() {
         this.getPopMeme()
       },
-      computed: {
-        imagechange: function() {
-           return this.image 
-        }
+      watcher() {
       },
       methods: {
         saveMeme() {
@@ -210,10 +225,26 @@
           .then((result) => {
             // console.log(result)
             app.popMemeList = result.data.data.memes
-            // console.log(app.popMemeList[0].url)
+            console.log(app.popMemeList[0].url)
           }).catch((err) => {
             console.log(err)
           });
+        },
+        handleFileUpload(){
+          this.isDisabled = true
+          this.file = this.$refs.file.files[0];
+          let reader  = new FileReader();
+
+          reader.addEventListener("load", function () {
+            // this.showPreview = true;
+            this.image = reader.result;
+          }.bind(this), false);
+
+          if( this.file ){
+            if ( /\.(jpe?g|png|gif)$/i.test( this.file.name ) ) {
+              reader.readAsDataURL( this.file );
+            }
+          }
         }
       }
     })
