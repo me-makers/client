@@ -9,7 +9,7 @@
     <meta name="author" content="">
 
     <title>Shop Homepage - Start Bootstrap Template</title>
-
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous">
     <link href="style.css" rel="stylesheet">
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -24,9 +24,10 @@
       <div class="container">
         <a class="navbar-brand" href="#">MeMaker</a>
         <div class="header-right">
-          <input type="text" placeholder="username / email">
-          <input type="password" placeholder="password">
-          <button class="btn-info" @click="login">Login</button>
+          <input type="text" placeholder="username / email" v-model='email' v-if=!token>
+          <input type="password" placeholder="password" v-model='password' v-if=!token>
+          <button @click="login" class="btn-info" v-if=!token>Login</button>
+          <button @click="logout" class="btn-info" v-if=token>Logout</button>
         </div>
       </div>
     </nav>
@@ -55,7 +56,7 @@
           			<ul class="twPc-Arrange">
           				<li class="twPc-ArrangeSizeFit">
           					<a href="https://twitter.com/mertskaplan" title="9.840 Tweet">
-          						<span class="twPc-StatLabel twPc-block">Tweets</span>
+          						<span class="twPc-StatLabel twPc-block">Memes</span>
           						<span class="twPc-StatValue">9.840</span>
           					</a>
           				</li>
@@ -87,6 +88,9 @@
             <div class="card-body">
               <h5 class="card-title">My Collections</h5>
               <button class="btn-primary card-title" data-toggle="modal" data-target="#exampleModal">Add Collection</button>
+              <p class="card-title" style="color: blue" @click="getList">Collection List</p>
+            </div>
+            <div class="card-body">
             </div>
           </div>
 
@@ -126,9 +130,16 @@
                 <div id="block"></div>
               </div>
               <div id="block"></div>
-              <!-- <div id="capture" style="padding: 10px; background: #f5da55">
-                <h4 style="color: #000; ">Hello world!</h4>
-              </div> -->
+            </div>
+            <div v-else v-for="img in imgs">
+              <div style="text-align: center">
+                <h2>{{img.title}}</h2>
+                <img :src='img.url' alt="">
+                <div>
+                  <div class="fb-share-button card-link" :data-href="img.url" data-layout="button_count"></div><br/>
+                  <a class="twitter-share-button" :href="'https://twitter.com/intent/tweet?text=Help us to find someone ' + img.url"  data-size="large"><i class="fab fa-twitter"></i></a><br/>
+                </div>
+              </div>
             </div>
             
           <!-- FORM END -->
@@ -140,7 +151,7 @@
           <div class="make-meme"></div>
           
           <!-- /.row -->
-          <!-- where list gallery -->
+
           <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
@@ -180,7 +191,7 @@
         <div class="col-lg-3">
           <div class="card  mb-3" style="max-width: 18rem;">
             <div class="card-body who-to-follow">
-              <h5 class="card-title">List of popular memes: <small><a href="#">Refresh</a></small></h5>
+              <h5 class="card-title">List of popular memes: <small></small></h5>
               <div class="row" v-for='meme in popMemeList'>
                 <span class="media-body twit-status">
                   <h5 class="mt-0">{{ meme.name }}: </h5><br>
@@ -212,10 +223,14 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em"
       crossorigin="anonymous"></script>
     <script src="./script.js"></script>
+    <script src="./component.js"></script>
     <script>
     let app = new Vue ({
       el:'#app',
       data: {
+        imgs: [],
+        email:'',
+        password:'',
         popMemeList: [],
         popMemeUrl: '',
         selectedUrlImage: '',
@@ -224,36 +239,83 @@
         text_top: '',
         text_bottom: '',
         showCreateForm: false,
-        isDisabled: false
-
+        isDisabled: false,
+        token:''
       },
       created() {
         this.getPopMeme()
+        this.token=localStorage.getItem('token')
       },
-      watcher() {
+      watch: {
+       imgs() {
+          (function (d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) return;
+              js = d.createElement(s);
+              js.id = id;
+              js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+              fjs.parentNode.insertBefore(js, fjs);
+              }(document, 'script', 'facebook-jssdk'))
+          }
       },
       methods: {
+        getList() {
+          this.showCreateForm = false
+          axios.get('http://localhost:3000/memes', {
+            headers: {
+                access_token: localStorage.getItem('token')
+            }
+          })
+          .then(result=>{
+              console.log(result.data)
+              this.imgs = result.data
+          })
+          .catch(err=>{
+                console.log(err)
+          })
+        },
+        login(){
+          axios.post('http://localhost:3000/users/login', {
+            email: app.email,
+            password: app.password
+          })
+          .then(result=>{
+              app.token=result.data.token
+              
+              localStorage.setItem('token',app.token)
+          })
+          .catch(err=>{
+                console.log(err)
+          })
+        },
+        logout(){
+            this.token=''
+            localStorage.removeItem('token')
+        },
         getMemeImg(link) {
             this.image = link.target.files[0]
-            // console.log("ini image", this.image);
+            console.log("ini image", this.image);
         },
-        uploadMeme: function() {
+        uploadMeme() {
           let formdata = new FormData()
           formdata.append('image', this.image)
 
           axios.post('http://localhost:3000/upload', formdata)
           .then((image) => {
+            let title = this.mtitle
+            let url = image.data.link
+            
+            console.log(title, url, typeof title, typeof url)
             axios({
-                method: 'post',
-                url: 'http://localhost:3000/memes/add',
-                headers: {
-                  'Content-Type': 'multipart/form-data',
-                  token: localStorage.getItem('token')
-                },
-                data: {
-                  title: this.mtitle,
-                  image: image.data.link
-                }
+              method: 'post',
+              url: 'http://localhost:3000/memes/add',
+              headers: {
+                access_token: localStorage.getItem('token')
+              },
+              data: {
+                url: url,
+                title: title
+              }
             })
             .then(function (response) {
                 console.log(response);
