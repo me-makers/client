@@ -159,3 +159,9 @@ ul.twPc-Arrange {
     text-transform: uppercase;
     transition: color 0.15s ease-in-out 0s;
 }
+
+.content img {
+    width: 500px;
+    height: auto;
+    max-height: 600px;
+}

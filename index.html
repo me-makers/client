@@ -22,7 +22,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container">
-        <a class="navbar-brand" href="#">Victwitter</a>
+        <a class="navbar-brand" href="#">MeMaker</a>
         <div class="header-right">
           <input type="text" placeholder="username / email">
           <input type="password" placeholder="password">
@@ -114,7 +114,8 @@
               <div class='meme'>
                 <div class='content'>
                   <div><h1 style="text-align: center">{{ text_top }}</h1></div>
-                  <img v-bind:src='image'>
+                  <img v-bind:src='image' v-if='image'>
+                  <img src="//placehold.it/500x500" v-else>
                   <h1 style="text-align: center">{{ text_bottom }}</h1>
                 </div>
               </div>
@@ -124,10 +125,10 @@
                 <label id="text-bottom">Caption Bottom</p>
                 <input v-model='text_bottom'><br><br>
                 <p>From URL</p>
-                <input id="imgURL" class="block" type="text" placeholder="Link to image" />
+                <input id="imgURL" class="block" v-model='image' type="text" placeholder="Link to image" :disabled="isDisabled"/>
                 <p>From Local Disk</p>
-                <input id="imgFile" type="file" accept="image/*" v-model='image'/><br><br>
-                <button class="btn btn-success" @click='saveMeme'>Save Meme</button>
+                <input id="imgFile" type="file" accept="image/*" ref="file" v-on:change="handleFileUpload()"/><br><br>
+                <button class="btn btn-success" @click='saveMeme'>Create Meme</button>
               </div>
             </div>
             
@@ -224,6 +225,7 @@
   </div>
     <!-- /.container -->>
     <!-- SCRIPT -->
+    
     <script src="./script.js"></script>
     <script>
     let app = new Vue ({
@@ -234,7 +236,8 @@
         image: '',
         text_top: '',
         text_bottom: '',
-        showCreateForm: false
+        showCreateForm: false,
+        isDisabled: false
 
       },
       created() {
@@ -256,6 +259,22 @@
           }).catch((err) => {
             console.log(err)
           });
+        },
+        handleFileUpload(){
+          this.isDisabled = true
+          this.file = this.$refs.file.files[0];
+          let reader  = new FileReader();
+
+          reader.addEventListener("load", function () {
+            // this.showPreview = true;
+            this.image = reader.result;
+          }.bind(this), false);
+
+          if( this.file ){
+            if ( /\.(jpe?g|png|gif)$/i.test( this.file.name ) ) {
+              reader.readAsDataURL( this.file );
+            }
+          }
         }
       }
     })
