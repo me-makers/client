@@ -258,8 +258,11 @@
           if (block.hasChildNodes()) {
               block.removeChild(block.childNodes[0]);
           }
+          
           html2canvas(document.getElementById('capture'), { allowTaint : true, onrendered: (canvas => {
-              capture.className = 'no-scroll'
+              capture.className = ''
+              var style = block.style;
+              style.left = 0;
               block.appendChild(canvas)
             })
           })
