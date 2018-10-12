@@ -212,13 +212,10 @@
 
         },
         getImage() {
-          console.log('setelah berubah', this.image)
           return this.image
         },
         choosePopMeme(url) {
-          console.log('before', this.image)
           this.image = url
-          console.log('after', this.image)
         },
         getPopMeme() {
           axios.get('https://api.imgflip.com/get_memes')
