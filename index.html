@@ -14,7 +14,7 @@
     <link href="style.css" rel="stylesheet">
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
   </head>
 
   <body>
@@ -111,9 +111,9 @@
           <hr>
           <!-- FORM -->
             <div class='content-wrapper' v-if='showCreateForm'>
-              <div class='meme'>
+              <div class='meme' id='capture'>
                 <div class='content'>
-                  <div><h1 style="text-align: center">{{ text_top }}</h1></div>
+                  <h1 style="text-align: center">{{ text_top }}</h1>
                   <img v-bind:src='image' v-if='image'>
                   <img src="//placehold.it/500x500" v-else>
                   <h1 style="text-align: center">{{ text_bottom }}</h1>
@@ -130,6 +130,10 @@
                 <input id="imgFile" type="file" accept="image/*" ref="file" v-on:change="handleFileUpload()"/><br><br>
                 <button class="btn btn-success" @click='saveMeme'>Create Meme</button>
               </div>
+              <div id="block"></div>
+              <!-- <div id="capture" style="padding: 10px; background: #f5da55">
+                <h4 style="color: #000; ">Hello world!</h4>
+              </div> -->
             </div>
             
           <!-- FORM END -->
@@ -248,7 +252,17 @@
       },
       methods: {
         saveMeme() {
-
+          let block = document.getElementById('block')
+          let capture = document.getElementById('capture')
+          capture.className = 'no-scroll'
+          if (block.hasChildNodes()) {
+              block.removeChild(block.childNodes[0]);
+          }
+          html2canvas(document.getElementById('capture'), { allowTaint : true, onrendered: (canvas => {
+              capture.className = 'no-scroll'
+              block.appendChild(canvas)
+            })
+          })
         },
         getPopMeme() {
           axios.get('https://api.imgflip.com/get_memes')
@@ -265,7 +279,7 @@
           this.file = this.$refs.file.files[0];
           let reader  = new FileReader();
 
-          reader.addEventListener("load", function () {
+          reader.addEventListener('load', function () {
             // this.showPreview = true;
             this.image = reader.result;
           }.bind(this), false);

@@ -163,5 +163,14 @@ ul.twPc-Arrange {
 .content img {
     width: 500px;
     height: auto;
-    max-height: 600px;
+    min-height: 250px;
+}
+
+.no-scroll {
+    overflow: visible !important;
+}
+
+#capture {
+    overflow: auto;
+    height: 100%;
 }
