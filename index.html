@@ -83,29 +83,21 @@
               <button class="btn-info">Search</button>
             </div>
           </div>
-          <button @click='getPopMeme'>Get 100 Most Popular Memes</button>
 
           <div class="card  mb-3" style="max-width: 18rem;">
             <div class="card-body">
-              <h5 class="card-title">Recently Followed</h5>
-              
+              <h5 class="card-title">My Collections</h5>
+              <button class="btn-primary card-title" data-toggle="modal" data-target="#exampleModal">Add Collection</button>
             </div>
           </div>
 
         </div>
-        <!-- /.col-lg-3 -->
 
         <div class="col-lg-6">
-            <!-- <div class="getMeme">
-                
-                <div class="popMeme" v-for='meme in popMemeList'>
-                  <img src="{{ meme }}" alt="">
-                </div>
-              </div> -->
           <div class="row">
             <div class="col-lg-12 col-md-12 mb-12 form-horizontal" >
               <div class="form-group">
-                <button class="btn-success" @click='showCreateForm=true'>I want to make new MEME !</button>
+                <button class="btn-primary" @click='showCreateForm=true'>I want to make new MEME !</button>
               </div>
             </div>
           </div>
@@ -131,10 +123,9 @@
                 <input id="imgFile" type="file" accept="image/*" ref="file" v-on:change="handleFileUpload()"/><br><br>
                 <button class="btn btn-success" @click='saveMeme'>Create Meme</button>
               </div>
-              <div id="block"></div>
-              <!-- <div id="capture" style="padding: 10px; background: #f5da55">
-                <h4 style="color: #000; ">Hello world!</h4>
-              </div> -->
+              <div id="block-wrap">
+                <div id="block"></div>
+              </div>
             </div>
             
           <!-- FORM END -->
@@ -144,19 +135,35 @@
           </div> -->
 
           <div class="make-meme"></div>
+          
+          <!-- /.row -->
+          <!-- where list gallery -->
+          <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Upload Now</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+                  </div>
+                <div class="modal-body">
 
-          <div class="row" v-for='meme in popMemeList'>
-            <div class="col-lg-12 col-md-12 timeline-wrapper" >
-              <div class="media ">
-                <img class="d-flex" :src='meme.url' alt="">
-                <span class="media-body twit-status">
-                  <h5 class="mt-0">{{ meme.name }}</h5><br>
-                </span>
+                <h5>Your memes bring joys to others</h5>
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label" >Image</label>
+                  <div class="col-sm-10">
+                  <input type="file" class="form-control" id="inputPassword3" placeholder="image" v-on:change="getMemeImg($event)">
+                  </div>
+                </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" @click="uploadMeme">Upload</button>
+                </div>
               </div>
             </div>
           </div>
-          
-          <!-- /.row -->
 
         </div>
         <!-- /.col-lg-6 -->
@@ -189,7 +196,12 @@
   </div>
     <!-- /.container -->>
     <!-- SCRIPT -->
-
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+      crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em"
+      crossorigin="anonymous"></script>
     <script src="./script.js"></script>
     <script>
     let app = new Vue ({
@@ -199,6 +211,7 @@
         popMemeUrl: '',
         selectedUrlImage: '',
         image: '',
+        mtitle: '',
         text_top: '',
         text_bottom: '',
         showCreateForm: false,
@@ -211,19 +224,56 @@
       watcher() {
       },
       methods: {
+        getMemeImg(link) {
+            this.image = link.target.files[0]
+            // console.log("ini image", this.image);
+        },
+        uploadMeme: function() {
+          let formdata = new FormData()
+          formdata.append('image', this.image)
+
+          axios.post('http://localhost:3000/upload', formdata)
+          .then((image) => {
+            // axios({
+            //     method: 'post',
+            //     url: 'http://localhost:3000/upload',
+            //     headers: {
+            //       'Content-Type': 'multipart/form-data'
+            //       // token: localStorage.getItem('token')
+            //     },
+            //     data: {
+            //       image: image.data.link
+            //     }
+            // })
+            // .then(function (response) {
+            //     console.log(response);
+            // })
+            // .catch(function (response) {
+                console.log(image);
+            // });
+          })
+          .catch((err) => {
+              console.log(err);
+              
+          });
+        },
         saveMeme() {
+          console.log(this.$refs);
+          let blockwrap = document.getElementById('block-wrap')
           let block = document.getElementById('block')
           let capture = document.getElementById('capture')
           capture.className = 'no-scroll'
           if (block.hasChildNodes()) {
-              block.removeChild(block.childNodes[0]);
+            block.removeChild(block.childNodes[0]);
           }
-          
+
           html2canvas(document.getElementById('capture'), { allowTaint : true, onrendered: (canvas => {
+            
               capture.className = ''
               var style = block.style;
               style.left = 0;
               block.appendChild(canvas)
+              
             })
           })
         },
@@ -239,7 +289,6 @@
         getPopMeme() {
           axios.get('https://api.imgflip.com/get_memes')
           .then((result) => {
-            // console.log(result)
             app.popMemeList = result.data.data.memes
             console.log(app.popMemeList[0].url)
           }).catch((err) => {
